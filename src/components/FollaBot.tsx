@@ -11,7 +11,6 @@ import FlairstechLogo from "../assets/images/flairstech-logo.png";
 import SendIcon from "../assets/icons/SendIcon";
 import MessageCircle from "../assets/icons/MessageCircle";
 import WriteIcon from "../assets/icons/WriteIcon";
-import ProfilePicture from "../assets/images/profile-picture.png";
 import BotThinking from "../assets/icons/BotThinking";
 import ErrorIcon from "../assets/icons/ErrorIcon";
 
