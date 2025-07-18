@@ -4,19 +4,31 @@
 :root {
   --font-family: "Poppins", sans-serif;
   --background: #ffffff;
-  --text-color: #f9f3f2;
+  --backgroundaccent: #F9FBFC;
+  --textcolor: #181D27;
+  --textaccent: #535862;
+  --bordercolor: #E9EAEB;
+  --switchcolor: #FDE8E8;
+
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-text: var(--text-color);
+  --color-backgroundaccent: var(--backgroundaccent);
+  --color-text: var(--textcolor);
+  --color-textaccent: var(--textaccent);
+  --color-border: var(--bordercolor);
+  --color-switch: var(--switchcolor);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: ##121212;
-    --text-color: #f9f3f2;
-  }
+
+.dark {
+    --background: #121212;
+    --backgroundaccent: #1D1F1F;
+    --textcolor: #ffffff;
+    --textaccent: #929292;
+    --bordercolor: #424243;
+    --switchcolor: #CF3B27;
 }
 
 @layer base {

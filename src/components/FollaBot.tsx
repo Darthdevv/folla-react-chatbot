@@ -1,18 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
+import { ThemeContext } from "../context/themeContext";
 import DOMPurify from "dompurify";
 import RobotIcon from "../assets/icons/RobotIcon";
 import MessageSquareChat from "../assets/icons/MessageSquareChat";
 import CloseIcon from "../assets/icons/CloseIcon";
-import Logo from "../assets/images/logo.png";
+import Logo from "../assets/icons/LogoIcon";
 import EditIcon from "../assets/icons/EditIcon";
 import RobotPulse from "../assets/icons/RobotPulse";
-import FlairstechLogo from "../assets/images/flairstech-logo.png";
 import SendIcon from "../assets/icons/SendIcon";
 import MessageCircle from "../assets/icons/MessageCircle";
 import WriteIcon from "../assets/icons/WriteIcon";
 import BotThinking from "../assets/icons/BotThinking";
 import ErrorIcon from "../assets/icons/ErrorIcon";
+import ToggleSwitch from "./ToggleSwitch";
+import FlairstechIcon from "../assets/icons/FlairstechIcon";
 
 interface Message {
   sender: "user" | "bot";
@@ -21,6 +23,7 @@ interface Message {
 }
 
 const ChatWidget: React.FC = () => {
+  const themeContext = useContext(ThemeContext);
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [message, setMessage] = useState("");
@@ -30,6 +33,10 @@ const ChatWidget: React.FC = () => {
   const [imageModal, setImageModal] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  if (!themeContext) return null;
+
+  const { theme, setTheme } = themeContext;
+  const darkMode = theme === "dark";
 
   const suggestions = [
     "Types of KPIs?",
@@ -207,9 +214,8 @@ const ChatWidget: React.FC = () => {
         ...prev,
         {
           sender: "bot",
-          text: `__ERROR__An error occurred: ${
-            err instanceof Error ? err.message : String(err)
-          }`,
+          text: `__ERROR__An error occurred: ${err instanceof Error ? err.message : String(err)
+            }`,
           timestamp: getCurrentTimestamp(),
         },
       ]);
@@ -299,6 +305,7 @@ const ChatWidget: React.FC = () => {
     return DOMPurify.sanitize(html);
   };
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: "smooth" });
@@ -321,23 +328,34 @@ const ChatWidget: React.FC = () => {
       )}
 
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-40 w-[480px] h-[640px] bg-[#F9FBFC] border border-[#E9EAEB] shadow-xl rounded-2xl flex flex-col overflow-hidden">
+        <div className="fixed bottom-24 right-6 z-40 w-[480px] h-[640px] bg-backgroundaccent border border-border shadow-xl rounded-2xl flex flex-col overflow-hidden">
           <div className="folla-gradient-blur absolute inset-0 top-90 left-90 -z-10 opacity-80" />
           <div className="folla-gradient-blur absolute inset-0 bottom-50 right-90 -z-10 opacity-80" />
 
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[#E9EAEB] bg-white">
-            <div className="flex items-center gap-2">
-              <img src={Logo} alt="folla logo" />
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background">
+            <div className="flex items-center gap-2 text-text">
+              <Logo />
             </div>
+
             <div className="flex items-center gap-5">
+              <ToggleSwitch
+                checked={darkMode}
+                onChange={() => {
+                  setTheme(darkMode ? "light" : "dark");
+                }}
+              />
               <button
                 onClick={handleNewChat}
-                className="text-sm text-[#181D27] font-medium flex items-center gap-2"
+                className="text-sm text-text font-medium flex items-center gap-2"
               >
                 <EditIcon />
                 New chat
               </button>
-              <button onClick={toggleChat} className="p-1" aria-label="Close">
+              <button
+                onClick={toggleChat}
+                className="p-1 text-text"
+                aria-label="Close"
+              >
                 <CloseIcon />
               </button>
             </div>
@@ -347,23 +365,23 @@ const ChatWidget: React.FC = () => {
             <div className="flex flex-col justify-end items-end flex-1 px-4 pb-2 pt-12 w-full">
               <div className="flex flex-col items-center text-center mx-auto max-w-[320px]">
                 <RobotPulse />
-                <h2 className="font-semibold text-xl mb-1.5 mt-1.5 text-[#181D27]">
+                <h2 className="font-semibold text-xl mb-1.5 mt-1.5 text-text">
                   How can Folla help you?
                 </h2>
-                <p className="text-sm text-[#535862] font-normal">
+                <p className="text-sm text-textaccent font-normal">
                   lorem ipsum dolor sit amet consectetur adipiscing elit
                 </p>
               </div>
               <div className="mt-auto">
-                <p className="font-medium text-base mb-2 text-[#181D27]">
+                <p className="font-medium text-base mb-2 text-text">
                   Suggest for you
                 </p>
-                <div className="flex flex-wrap gap-2 bg-white p-3 rounded-xl shadow-sm">
+                <div className="flex flex-wrap gap-2 bg-background p-3 rounded-xl shadow-sm">
                   {suggestions.map((text, i) => (
                     <button
                       key={i}
                       onClick={() => handleSuggestionClick(text)}
-                      className="flex items-center gap-1 px-3 py-2.5 text-sm font-normal bg-[#F9FBFC] rounded-full border border-[#E9EAEB] text-[#252B37] hover:bg-[#F9FBFC]"
+                      className="flex items-center gap-1 px-3 py-2.5 text-sm font-normal bg-backgroundaccent rounded-full border border-border text-text hover:bg-backgroundaccent"
                     >
                       <WriteIcon />
                       <span className="ml-2">{text}</span>
@@ -379,9 +397,8 @@ const ChatWidget: React.FC = () => {
               {messages.map((msg, i) => (
                 <div
                   key={i}
-                  className={`flex ${
-                    msg.sender === "bot" ? "flex-row" : "flex-row-reverse"
-                  } items-start gap-2`}
+                  className={`flex ${msg.sender === "bot" ? "flex-row" : "flex-row-reverse"
+                    } items-start gap-2`}
                 >
                   {msg.sender === "bot" ? (
                     <RobotIcon />
@@ -395,30 +412,28 @@ const ChatWidget: React.FC = () => {
                     />
                   )}
                   <div>
-                    <p className="flex items-center justify-between text-sm text-[#181D27] font-medium mb-1">
+                    <p className="flex items-center justify-between text-sm text-text font-medium mb-1">
                       {msg.sender === "bot" ? "Folla" : "You"}
-                      <span className="ml-1 text-[#535862] font-normal text-xs">
+                      <span className="ml-1 text-textaccent font-normal text-xs">
                         {msg.timestamp}
                       </span>
                     </p>
                     {msg.text.startsWith("__ERROR__") ? (
                       <div
-                        className={`bg-white rounded-lg px-3 py-2 text-sm border border-[#E9EAEB] max-w-xs text-[#181D27] font-normal flex items-start gap-2 ${
-                          msg.sender === "bot"
+                        className={`bg-background rounded-lg px-3 py-2 text-sm border border-border max-w-xs text-text font-normal flex items-start gap-2 ${msg.sender === "bot"
                             ? "border-s-0 rounded-tl-none"
                             : "border-e-0 rounded-tr-none"
-                        }`}
+                          }`}
                       >
                         <ErrorIcon />
                         <span>{msg.text.replace("__ERROR__", "")}</span>
                       </div>
                     ) : (
                       <div
-                        className={`bg-white rounded-lg px-3 py-2 text-sm border border-[#E9EAEB] max-w-xs text-[#181D27] font-normal prose ${
-                          msg.sender === "bot"
+                        className={`bg-background rounded-lg px-3 py-2 text-sm border border-border max-w-xs text-text font-normal prose ${msg.sender === "bot"
                             ? "border-s-0 rounded-tl-none"
                             : "border-e-0 rounded-tr-none"
-                        }`}
+                          }`}
                         dangerouslySetInnerHTML={{
                           __html: renderMarkdown(msg.text || ""),
                         }}
@@ -436,7 +451,7 @@ const ChatWidget: React.FC = () => {
               {isBotTyping && (
                 <div className="flex items-start">
                   <RobotIcon />
-                  <div className="bg-white flex items-center justify-center gap-0 ml-2 rounded-lg border-s-0 rounded-tl-none px-3 py-1 text-sm border border-[#E9EAEB] max-w-xs">
+                  <div className="bg-background flex items-center justify-center gap-0 ml-2 rounded-lg border-s-0 rounded-tl-none px-3 py-1 text-sm border border-border max-w-xs">
                     <BotThinking />
                     <div className="flex gap-1 px-2 py-1">
                       <span className="w-1 h-1 bg-[#535862] rounded-full animate-bounce-small delay-0"></span>
@@ -451,9 +466,9 @@ const ChatWidget: React.FC = () => {
           )}
 
           <div className="px-4 pb-4">
-            <div className="flex items-center justify-center bg-white border border-[#E9EAEB] rounded-[31.25rem] pl-4 pr-2 py-2">
+            <div className="flex items-center justify-center bg-background border border-border rounded-[31.25rem] pl-4 pr-2 py-2">
               <span
-                className="rounded-full w-8 h-8 flex items-center justify-center shrink-0"
+                className="rounded-full w-8 h-8 flex items-center justify-center shrink-0 text-text"
                 aria-label="message icon"
               >
                 <MessageCircle />
@@ -464,18 +479,18 @@ const ChatWidget: React.FC = () => {
                 placeholder="Message Folla..."
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyPress}
-                className="flex-1 bg-transparent placeholder:text-[#717680] font-normal outline-none text-sm indent-2"
+                className="flex-1 bg-transparent placeholder:text-textaccent font-normal outline-none text-sm indent-2 text-text"
               />
               <button
                 onClick={() => handleSend(message)}
-                className="text-red-600 hover:bg-red-700 bg-[#CF3B27] rounded-full w-8 h-8 flex items-center justify-center shrink-0"
+                className="text-text bg-[#CF3B27] hover:bg-[#cf3b27d5] rounded-full w-8 h-8 flex items-center justify-center shrink-0"
                 aria-label="Send"
               >
                 <SendIcon />
               </button>
             </div>
-            <p className="text-center flex items-center justify-center gap-2 text-xs mt-4 text-[#414651] font-normal">
-              Powered by <img src={FlairstechLogo} alt="flairstech logo" />
+            <p className="text-center flex items-center justify-center gap-2 text-xs mt-4 text-text font-normal">
+              Powered by <FlairstechIcon />
             </p>
           </div>
         </div>
@@ -489,12 +504,11 @@ const ChatWidget: React.FC = () => {
             className="relative"
           >
             <div
-              className={`absolute bottom-4 right-0 w-[20.5rem] pl-6 py-5 bg-[#F9FBFC] border border-[#E9EAEB] shadow-xl rounded-2xl text-[#181D27] font-normal text-sm leading-[1.23rem] transition-all duration-300 ease-out
-              ${
-                isHovered
+              className={`absolute bottom-4 right-0 w-[20.5rem] pl-6 py-5 bg-backgroundaccent border border-border shadow-xl rounded-2xl text-text font-normal text-sm leading-[1.23rem] transition-all duration-300 ease-out
+              ${isHovered
                   ? "opacity-100 translate-y-0 pointer-events-auto"
                   : "opacity-0 translate-y-2 pointer-events-none"
-              }`}
+                }`}
             >
               <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
                 <RobotIcon />
@@ -513,7 +527,7 @@ const ChatWidget: React.FC = () => {
           <button
             onClick={toggleChat}
             aria-label={isOpen ? "Close chat" : "Open chat"}
-            className="bg-[#CF3B27] hover:bg-red-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all duration-300"
+            className="bg-[#CF3B27] hover:bg-[#cf3b27d5] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all duration-300"
           >
             <MessageSquareChat />
           </button>
